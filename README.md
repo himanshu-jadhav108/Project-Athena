@@ -11,7 +11,8 @@ _“Play Your Part: Youth Designing the Future of Media and Information Literacy
 
   <p align="center">
     <a href="https://athena-eta-flame.vercel.app/"><img src="https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo"></a>
-    <a href="https://drive.google.com/file/d/1XVQtJ0OKH3B66EuOJ7oiXDxQFfyaR8Zc/view?usp=drive_link"><img src="https://img.shields.io/badge/Demo_Video-Google_Drive-FF8800?style=for-the-badge&logo=googledrive&logoColor=white" alt="Demo Video"></a>
+    <a href="https://youtu.be/Fj0Ct8kYpo8"><img src="https://img.shields.io/badge/Demo_Video-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube Demo Video"></a>
+    <a href="https://drive.google.com/file/d/1XVQtJ0OKH3B66EuOJ7oiXDxQFfyaR8Zc/view?usp=drive_link"><img src="https://img.shields.io/badge/Demo_Video-Google_Drive-FF8800?style=for-the-badge&logo=googledrive&logoColor=white" alt="Google Drive Demo Video"></a>
     <a href="https://athena-backend-wrfq.onrender.com/"><img src="https://img.shields.io/badge/Backend_API-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Backend API"></a>
     <a href="https://athena-backend-wrfq.onrender.com/docs"><img src="https://img.shields.io/badge/API_Docs-Swagger-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="Swagger Docs"></a>
     <a href="https://github.com/himanshu-jadhav108/Project-Athena"><img src="https://img.shields.io/badge/Test_Suite-13%2F13_Passing-success?style=for-the-badge&logo=pytest&logoColor=white" alt="Test Suite"></a>
@@ -19,7 +20,8 @@ _“Play Your Part: Youth Designing the Future of Media and Information Literacy
   </p>
 
   <p align="center">
-    <a href="https://drive.google.com/file/d/1XVQtJ0OKH3B66EuOJ7oiXDxQFfyaR8Zc/view?usp=drive_link" target="_blank"><b>🎥 Demo Video</b></a> •
+    <a href="https://youtu.be/Fj0Ct8kYpo8" target="_blank"><b>▶️ YouTube Video</b></a> •
+    <a href="https://drive.google.com/file/d/1XVQtJ0OKH3B66EuOJ7oiXDxQFfyaR8Zc/view?usp=drive_link" target="_blank"><b>🎥 Drive Video</b></a> •
     <a href="https://athena-eta-flame.vercel.app/" target="_blank"><b>🌐 Live Website</b></a> •
     <a href="#-key-project-links"><b>🔗 Quick Links</b></a> •
     <a href="#-key-feature-matrix"><b>🚀 Key Features</b></a> •
@@ -39,11 +41,17 @@ _“Play Your Part: Youth Designing the Future of Media and Information Literacy
 ## 🎥 Platform Demonstration
 
 <div align="center">
-  <a href="https://drive.google.com/file/d/1XVQtJ0OKH3B66EuOJ7oiXDxQFfyaR8Zc/view?usp=drive_link" target="_blank">
-    <img src="https://img.shields.io/badge/▶_Watch_Demonstration_Video-Google_Drive-FF8800?style=for-the-badge&logo=googledrive&logoColor=white" alt="Watch Demo Video on Google Drive" />
-  </a>
+  <p align="center">
+    <a href="https://youtu.be/Fj0Ct8kYpo8" target="_blank">
+      <img src="https://img.shields.io/badge/▶_Watch_on_YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Demo on YouTube" />
+    </a>
+    &nbsp;
+    <a href="https://drive.google.com/file/d/1XVQtJ0OKH3B66EuOJ7oiXDxQFfyaR8Zc/view?usp=drive_link" target="_blank">
+      <img src="https://img.shields.io/badge/▶_Watch_on_Google_Drive-FF8800?style=for-the-badge&logo=googledrive&logoColor=white" alt="Watch Demo on Google Drive" />
+    </a>
+  </p>
   <p style="margin-top: 12px;">
-    🎬 <i>Click above or <b><a href="https://drive.google.com/file/d/1XVQtJ0OKH3B66EuOJ7oiXDxQFfyaR8Zc/view?usp=drive_link" target="_blank">Open on Google Drive ↗</a></b> to watch the complete 360° investigation walkthrough and pitch demo.</i>
+    🎬 <i>Watch the complete 360° investigation walkthrough and pitch demo on <b><a href="https://youtu.be/Fj0Ct8kYpo8" target="_blank">YouTube ↗</a></b> or <b><a href="https://drive.google.com/file/d/1XVQtJ0OKH3B66EuOJ7oiXDxQFfyaR8Zc/view?usp=drive_link" target="_blank">Google Drive ↗</a></b>.</i>
   </p>
   <p><i>Figure 1: ATHENA Live Workspace — Multi-Dimensional Trust Passport, Perspective Explorer, Narrative Memory, and UNESCO MIL Trainer.</i></p>
 </div>
@@ -55,7 +63,8 @@ _“Play Your Part: Youth Designing the Future of Media and Information Literacy
 | Artifact                        | Access Link / Status                                                                                                     | Description                                                       |
 | :------------------------------ | :----------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------- |
 | 🌐 **Live Web Application**     | [https://athena-eta-flame.vercel.app/](https://athena-eta-flame.vercel.app/)                                             | Production Next.js 14 Client deployed on Vercel Edge Network      |
-| 🎥 **Demo Video**               | [Watch Demo Video (Google Drive)](https://drive.google.com/file/d/1XVQtJ0OKH3B66EuOJ7oiXDxQFfyaR8Zc/view?usp=drive_link) | End-to-end walkthrough of 360° investigation workspace & AI tutor |
+| 📺 **YouTube Demo Video**       | [https://youtu.be/Fj0Ct8kYpo8](https://youtu.be/Fj0Ct8kYpo8)                                                             | High-definition video walkthrough of ATHENA investigation platform |
+| 🎥 **Google Drive Demo Video**  | [Watch on Google Drive](https://drive.google.com/file/d/1XVQtJ0OKH3B66EuOJ7oiXDxQFfyaR8Zc/view?usp=drive_link)         | Full pitch recording and walkthrough on Google Drive               |
 | ⚡ **Backend REST API**         | [https://athena-backend-wrfq.onrender.com/](https://athena-backend-wrfq.onrender.com/)                                   | FastAPI Asynchronous Engine hosted on Render Cloud                |
 | 📜 **Interactive Swagger Docs** | [https://athena-backend-wrfq.onrender.com/docs](https://athena-backend-wrfq.onrender.com/docs)                           | OpenAPI 3.0 Interactive API Explorer & Schema Specs               |
 | 📚 **ReDoc API Specifications** | [https://athena-backend-wrfq.onrender.com/redoc](https://athena-backend-wrfq.onrender.com/redoc)                         | Human-readable REST API documentation                             |
