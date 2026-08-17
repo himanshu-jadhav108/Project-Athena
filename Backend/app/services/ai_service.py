@@ -17,6 +17,13 @@ from datetime import datetime, timezone
 DEMO_INVESTIGATION_PAYLOAD = {
     "claim_id": "demo-claim-2026-unesco",
     "is_demo": True,
+    "mode": "demo",
+    "provenance": {
+        "mode": "demo",
+        "evidence_status": "curated",
+        "historical_status": "curated"
+    },
+    "status": "success",
     "input_text": "BREAKING: Scientists have officially approved a revolutionary technology that can eliminate all digital misinformation automatically using AI quantum frequency scans.",
     "claim_summary": {
         "primary_claim": "Scientists approved a revolutionary AI quantum frequency technology that automatically eliminates all digital misinformation.",
@@ -45,21 +52,21 @@ DEMO_INVESTIGATION_PAYLOAD = {
                 {
                     "title": "Quantum AI Misinformation Scams: A Fact Check",
                     "publisher": "International Fact-Checking Network (IFCN)",
-                    "url": "https://factcheck.org/demo-quantum-ai-myth",
+                    "url": "",
                     "relevance": 96,
                     "verdict": "Contradicted — No peer-reviewed paper or official scientific body supports this claim."
                 },
                 {
                     "title": "MIT Technology Review on Automated Misinformation Detection Limits",
                     "publisher": "MIT Technology Review",
-                    "url": "https://technologyreview.com/demo-ai-limits",
+                    "url": "",
                     "relevance": 92,
                     "verdict": "Contradicted — Current AI systems cannot determine absolute truth without context."
                 },
                 {
                     "title": "UNESCO Statement on MIL and AI Verification Tools",
                     "publisher": "UNESCO Communication and Information",
-                    "url": "https://unesco.org/mil-ai-guidelines",
+                    "url": "",
                     "relevance": 90,
                     "verdict": "Context — Media literacy emphasizes critical thinking over automated censorship."
                 }
@@ -225,6 +232,40 @@ DEMO_INVESTIGATION_PAYLOAD = {
 
 
 # ───────────────────────────────────────────────
+# HELPER FOR STRUCTURED UNAVAILABLE RESPONSES
+# ───────────────────────────────────────────────
+
+def build_unavailable_response(
+    text: str,
+    error_code: str = "LIVE_ANALYSIS_UNAVAILABLE",
+    error_message: str = "ATHENA could not complete this analysis reliably."
+) -> Dict[str, Any]:
+    """
+    Returns an honest, structured analysis-unavailable response.
+    Guarantees that deterministic demo evidence is NEVER substituted for arbitrary input.
+    """
+    return {
+        "claim_id": f"unavailable-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
+        "is_demo": False,
+        "mode": "unavailable",
+        "provenance": {
+            "mode": "unavailable",
+            "evidence_status": "unavailable",
+            "historical_status": "unavailable"
+        },
+        "status": "unavailable",
+        "error_code": error_code,
+        "error_message": error_message,
+        "input_text": text or "",
+        "claim_summary": None,
+        "trust_passport": None,
+        "perspective_explorer": None,
+        "narrative_memory": None,
+        "ai_tutor": None,
+    }
+
+
+# ───────────────────────────────────────────────
 # AI PROVIDER ABSTRACT BASE CLASS & IMPLEMENTATION
 # ───────────────────────────────────────────────
 
@@ -234,34 +275,98 @@ class BaseAIProvider:
         raise NotImplementedError
 
 class DeterministicDemoProvider(BaseAIProvider):
-    """Fallback / Pitch Demo Provider returning rich deterministic payloads."""
-    async def analyze_content(self, text: str, url: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Pitch Demo Provider returning rich deterministic payloads.
+    Always flags is_demo=True and provenance.mode='demo'.
+    Does not substitute its curated evidence for arbitrary live user claims.
+    """
+    async def analyze_content(self, text: str = "", url: Optional[str] = None) -> Dict[str, Any]:
         payload = json.loads(json.dumps(DEMO_INVESTIGATION_PAYLOAD))
-        if text and len(text.strip()) > 0:
-            payload["input_text"] = text
-            payload["trust_passport"]["claim"] = text[:150] + ("..." if len(text) > 150 else "")
-            payload["claim_summary"]["primary_claim"] = text
-            payload["is_demo"] = False
+        payload["is_demo"] = True
+        payload["mode"] = "demo"
+        payload["provenance"] = {
+            "mode": "demo",
+            "evidence_status": "curated",
+            "historical_status": "curated"
+        }
+        payload["status"] = "success"
         return payload
 
 class LiveAIProvider(BaseAIProvider):
-    """Live AI Provider using Gemini API with safe deterministic fallback."""
-    def __init__(self, api_key: str):
-        self.api_key = api_key
+    """
+    Live AI Provider using Gemini API with robust response validation.
+    If the model fails, times out, or returns invalid data, returns a structured
+    unavailable response instead of silently substituting demonstration evidence.
+    """
+    def __init__(self, api_key: Optional[str] = None):
+        self.api_key = api_key or ""
+
+    def _is_valid_key(self) -> bool:
+        if not self.api_key:
+            return False
+        key = self.api_key.strip().lower()
+        invalid_prefixes = ("your-", "change-me", "example-", "placeholder", "xxxx", "test-key", "none", "null")
+        if any(key.startswith(p) for p in invalid_prefixes) or len(key) < 8:
+            return False
+        return True
+
+    def _validate_structure(self, parsed: Any, text: str) -> Optional[Dict[str, Any]]:
+        """
+        Strictly validates the parsed JSON response from the AI model.
+        Returns the formatted payload if valid, or None if required fields are missing.
+        """
+        if not isinstance(parsed, dict):
+            return None
+
+        # Check required top-level structures
+        required_top_keys = ["claim_summary", "trust_passport", "perspective_explorer", "narrative_memory", "ai_tutor"]
+        if not all(k in parsed and isinstance(parsed[k], dict) for k in required_top_keys):
+            return None
+
+        tp = parsed["trust_passport"]
+        if not isinstance(tp, dict):
+            return None
+
+        # Ensure minimal required passport fields
+        if not tp.get("claim") or not tp.get("assessment"):
+            return None
+
+        # Ensure non-binary assessment code
+        valid_codes = {"INSUFFICIENT_EVIDENCE", "CONTRADICTED", "CORROBORATED", "MIXED_EVIDENCE"}
+        if tp.get("assessment_code") not in valid_codes:
+            tp["assessment_code"] = "INSUFFICIENT_EVIDENCE"
+
+        # Check narrative timeline presence
+        timeline = parsed.get("narrative_memory", {}).get("timeline", [])
+        has_timeline = isinstance(timeline, list) and len(timeline) > 0
+
+        # Populate standard ATHENA metadata with structured provenance
+        parsed["claim_id"] = f"live-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+        parsed["is_demo"] = False
+        parsed["mode"] = "live"
+        parsed["provenance"] = {
+            "mode": "live",
+            "evidence_status": "ai_assessed",
+            "historical_status": "grounded" if has_timeline else "unavailable"
+        }
+        parsed["status"] = "success"
+        parsed["input_text"] = text
+        return parsed
 
     async def analyze_content(self, text: str, url: Optional[str] = None) -> Dict[str, Any]:
-        fallback_provider = DeterministicDemoProvider()
-        fallback_data = await fallback_provider.analyze_content(text, url)
-
-        invalid_keys = ["your-gemini-key", "your_gemini_api_key_here", "your-openai-key", "none", "null", ""]
-        if not self.api_key or self.api_key.strip().lower() in invalid_keys:
-            return fallback_data
+        if not self._is_valid_key():
+            return build_unavailable_response(
+                text=text,
+                error_code="API_KEY_NOT_CONFIGURED",
+                error_message="Live AI analysis is currently unavailable because a valid Gemini API key is not configured."
+            )
 
         try:
             prompt = (
                 "You are ATHENA, an epistemologically sound AI media literacy platform for UNESCO. "
                 "Analyze the following text/claim without ever making binary true/false verdicts. "
-                "Instead, evaluate evidence, context, and framing.\n\n"
+                "Instead, evaluate evidence, context, and framing. "
+                "Clearly separate observed facts from inferences. When uncertain, say so.\n\n"
                 f"TEXT TO ANALYZE:\n{text}\n\n"
                 "Return ONLY a valid JSON object matching this exact top-level structure:\n"
                 "{\n"
@@ -269,27 +374,38 @@ class LiveAIProvider(BaseAIProvider):
                 '  "trust_passport": {\n'
                 '    "claim": "...",\n'
                 '    "source": {"origin": "...", "publisher": "...", "transparency_score": "High|Medium|Low"},\n'
-                '    "evidence": {"supporting_count": 0, "conflicting_count": 0, "unverified_count": 1, "conflicting_items": []},\n'
+                '    "evidence": {\n'
+                '      "supporting_count": 0,\n'
+                '      "conflicting_count": 0,\n'
+                '      "unverified_count": 1,\n'
+                '      "supporting_items": [],\n'
+                '      "conflicting_items": [{"title": "...", "publisher": "...", "url": "", "verdict": "..."}],\n'
+                '      "unverified_items": [{"title": "...", "publisher": "...", "url": "", "verdict": "..."}]\n'
+                '    },\n'
                 '    "context": {"missing_context": ["..."], "historical_precedent": "..."},\n'
-                '    "language_analysis": {"sensationalism_score": 50, "loaded_words": []},\n'
+                '    "language_analysis": {"sensationalism_score": 50, "loaded_words": [], "tone": "..."},\n'
                 '    "assessment": "...",\n'
                 '    "assessment_code": "INSUFFICIENT_EVIDENCE|CONTRADICTED|CORROBORATED|MIXED_EVIDENCE",\n'
                 '    "confidence_level": "...",\n'
                 '    "uncertainty_notes": "...",\n'
                 '    "suggested_actions": ["..."]\n'
                 '  },\n'
-                '  "perspective_explorer": {"perspectives": [], "common_ground": "...", "key_differences": "...", "remaining_uncertainties": "..."},\n'
+                '  "perspective_explorer": {"perspectives": [{"category": "...", "source_name": "...", "stance": "...", "summary": "...", "quote": "..."}], "common_ground": "...", "key_differences": "...", "remaining_uncertainties": "..."},\n'
                 '  "narrative_memory": {"title": "...", "timeline": []},\n'
-                '  "ai_tutor": {"explanation": {"core_concept": "...", "why_misleading": "...", "literacy_skills_taught": []}, "quiz": {"title": "...", "questions": []}}\n'
+                '  "ai_tutor": {"explanation": {"core_concept": "...", "why_misleading": "...", "literacy_skills_taught": []}, "quiz": {"title": "...", "questions": [{"id": "q1", "question": "...", "options": ["A. ...", "B. ...", "C. ..."], "correct_option": 0, "explanation": "..."}]}}\n'
                 "}\n"
-                "RULES:\n"
-                "1. Use assessment_code from: INSUFFICIENT_EVIDENCE, CONTRADICTED, CORROBORATED, MIXED_EVIDENCE.\n"
-                "2. Never fabricate fake URLs, false publication names, or fake quotes.\n"
-                "3. Keep narrative_memory timeline empty or grounded in actual input context.\n"
+                "STRICT RULES — violating these is not acceptable:\n"
+                "1. assessment_code must be one of: INSUFFICIENT_EVIDENCE, CONTRADICTED, CORROBORATED, MIXED_EVIDENCE.\n"
+                "2. All url fields must be empty strings (''). Never invent or guess any URLs.\n"
+                "3. Never fabricate publication names, quotes, statistics, or dates not present in the input.\n"
+                "4. narrative_memory.timeline must be empty ([]) unless verifiable chronological data exists in the input text.\n"
+                "5. In assessment text, explicitly separate observed content (what the text states) from inferred patterns (what this typically signals).\n"
+                "6. uncertainty_notes must describe what specifically cannot be verified — do not use generic boilerplate.\n"
+                "7. suggested_actions must be actionable verification steps the user can take, not general advice.\n"
             )
 
             url_endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.api_key}"
-            async with httpx.AsyncClient(timeout=10.0) as client:
+            async with httpx.AsyncClient(timeout=8.0) as client:
                 resp = await client.post(
                     url_endpoint,
                     json={"contents": [{"parts": [{"text": prompt}]}]},
@@ -303,17 +419,35 @@ class LiveAIProvider(BaseAIProvider):
                         json_match = re.search(r"\{.*\}", raw_text, re.DOTALL)
                         if json_match:
                             parsed = json.loads(json_match.group(0))
-                            if isinstance(parsed, dict) and "trust_passport" in parsed:
-                                parsed["is_demo"] = False
-                                parsed["input_text"] = text
-                                return parsed
-        except Exception:
-            pass
-
-        return fallback_data
+                            validated = self._validate_structure(parsed, text)
+                            if validated is not None:
+                                return validated
+                    return build_unavailable_response(
+                        text=text,
+                        error_code="MALFORMED_AI_RESPONSE",
+                        error_message="ATHENA could not complete this analysis reliably (the model returned incomplete structured data)."
+                    )
+                else:
+                    return build_unavailable_response(
+                        text=text,
+                        error_code=f"UPSTREAM_HTTP_{resp.status_code}",
+                        error_message="ATHENA could not complete this analysis reliably (upstream AI service error)."
+                    )
+        except httpx.TimeoutException:
+            return build_unavailable_response(
+                text=text,
+                error_code="UPSTREAM_TIMEOUT",
+                error_message="ATHENA could not complete this analysis reliably (upstream AI service timed out)."
+            )
+        except Exception as e:
+            return build_unavailable_response(
+                text=text,
+                error_code="ANALYSIS_EXCEPTION",
+                error_message="ATHENA could not complete this analysis reliably."
+            )
 
 def get_ai_provider() -> BaseAIProvider:
-    """Factory to return live provider if configured with valid key, else deterministic demo provider."""
+    """Factory to return live AI provider configured with settings or env key."""
     try:
         from app.config import get_settings
         settings = get_settings()
@@ -322,22 +456,22 @@ def get_ai_provider() -> BaseAIProvider:
     except Exception:
         pass
 
-    gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if gemini_key:
-        return LiveAIProvider(gemini_key)
-    return DeterministicDemoProvider()
+    gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or ""
+    return LiveAIProvider(gemini_key)
 
 
 # ───────────────────────────────────────────────
 # CORE SERVICE FUNCTIONS
 # ───────────────────────────────────────────────
 
-async def run_investigation(text: str, url: Optional[str] = None, is_demo_mode: bool = False) -> Dict[str, Any]:
+async def run_investigation(text: str = "", url: Optional[str] = None, is_demo_mode: bool = False) -> Dict[str, Any]:
     """
     Run full end-to-end ATHENA investigation.
-    Combines Claim Extraction, Trust Passport, Perspective Explorer, Narrative Memory, and AI Tutor.
+    - If is_demo_mode is True: returns the curated UNESCO pitch demonstration dataset.
+    - If is_demo_mode is False: runs live AI analysis. If live AI is unavailable or fails,
+      returns a structured analysis-unavailable response. Never silently substitutes demo evidence.
     """
-    if is_demo_mode or not text or not text.strip():
+    if is_demo_mode:
         provider = DeterministicDemoProvider()
     else:
         provider = get_ai_provider()
@@ -345,3 +479,4 @@ async def run_investigation(text: str, url: Optional[str] = None, is_demo_mode: 
     result = await provider.analyze_content(text, url)
     result["timestamp"] = datetime.now(timezone.utc).isoformat()
     return result
+

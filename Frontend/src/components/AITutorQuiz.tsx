@@ -3,13 +3,15 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   GraduationCap, Brain, CheckCircle, XCircle, Lightbulb, ArrowRight,
-  BookOpen, Target, Eye, Search, GitBranch, ShieldCheck
+  BookOpen, Target, Eye, Search, GitBranch, ShieldCheck, Sparkles
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 
 interface TutorProps {
   data: any;
   claim?: string;
+  isDemo?: boolean;
+  provenance?: any;
   onCompleteQuiz?: (score: number, total: number) => void;
 }
 
@@ -62,7 +64,7 @@ function LearningPayoff({ score, total, claim }: { score: number; total: number;
         </div>
       </div>
 
-      {/* ── Skills Practiced ──────────────────────────── */}
+      {/* ── Skills Practiced ──────────────────── */}
       <div className="glass-card p-6 rounded-2xl border border-teal-500/20 bg-teal-950/10 space-y-4">
         <h4 className="text-sm font-bold text-teal-300 flex items-center gap-2">
           <ShieldCheck className="w-4 h-4" />
@@ -112,8 +114,9 @@ function LearningPayoff({ score, total, claim }: { score: number; total: number;
   );
 }
 
-export default function AITutorQuiz({ data, claim, onCompleteQuiz }: TutorProps) {
+export default function AITutorQuiz({ data, claim, isDemo = false, provenance, onCompleteQuiz }: TutorProps) {
   const { t } = useI18n();
+  const isCuratedDemo = isDemo || provenance?.mode === 'demo' || data?.is_demo;
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
@@ -150,14 +153,31 @@ export default function AITutorQuiz({ data, claim, onCompleteQuiz }: TutorProps)
 
       {/* ── Tutor Header ─────────────────────────────── */}
       <div className="glass-card p-6 rounded-2xl border border-purple-500/20 bg-gradient-to-br from-slate-900 to-purple-950/30 space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-purple-500/10 rounded-xl text-purple-400">
-            <Brain className="w-6 h-6" />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-purple-500/10 rounded-xl text-purple-400">
+              <Brain className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-bold text-slate-100 text-editorial">{t('tutorTitle')}</h3>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono-code font-bold uppercase tracking-wider bg-slate-900 border border-slate-800 text-purple-400">
+                  04 • LEARN
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">What evaluation skill can you apply next time?</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-slate-100 text-editorial">{t('tutorTitle')}</h3>
-            <p className="text-xs text-slate-400">Connected to what you just investigated</p>
-          </div>
+          {isCuratedDemo ? (
+            <span className="demo-badge">
+              <Sparkles className="w-3 h-3" />
+              CURATED LEARNING CHALLENGE
+            </span>
+          ) : (
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase border border-purple-500/30 bg-purple-500/10 text-purple-300">
+              AI-Generated Challenge
+            </span>
+          )}
         </div>
 
         {/* Three-part structure: What / Why / Apply */}

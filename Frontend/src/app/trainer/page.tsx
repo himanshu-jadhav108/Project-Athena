@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, CheckCircle, XCircle, ArrowRight, Trophy, RotateCcw } from 'lucide-react';
+import { BookOpen, CheckCircle, XCircle, ArrowRight, Trophy, RotateCcw, Info } from 'lucide-react';
+import Spinner from '@/components/Spinner';
 import toast from 'react-hot-toast';
 
 interface Question {
@@ -132,24 +133,47 @@ export default function Trainer() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-text-main)] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500" />
+        <div className="glass-card p-8 rounded-2xl border border-slate-800 flex flex-col items-center gap-4">
+          <Spinner />
+          <p className="text-sm text-slate-400">Loading media literacy questions...</p>
+        </div>
       </div>
     );
   }
 
   if (finished) {
-    const percentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+    const correct = score;
+    const total = questions.length;
+    const qualitativeLabel =
+      total === 0 ? 'Quiz Complete'
+      : score === total ? 'Excellent critical thinking!'
+      : score >= total * 0.7 ? 'Strong performance — keep practicing!'
+      : score >= total * 0.4 ? 'Good effort — review the explanations below.'
+      : 'Keep learning — media literacy takes practice!';
+
     return (
       <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-text-main)] py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-lg mx-auto text-center">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="mb-8">
+        <div className="max-w-lg mx-auto text-center space-y-8">
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
             <Trophy className="w-20 h-20 text-amber-400 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-slate-100 text-editorial mb-2">Quiz Complete!</h1>
-            <p className="text-slate-400">You scored {score} out of {questions.length}</p>
+            <p className="text-slate-400">You answered {correct} of {total} questions correctly.</p>
           </motion.div>
 
-          <div className={`text-5xl font-bold mb-8 font-mono-code ${percentage >= 80 ? 'text-emerald-400' : percentage >= 60 ? 'text-amber-400' : 'text-rose-400'}`}>
-            {percentage}%
+          <div className="glass-card p-5 rounded-2xl border border-slate-800 text-left space-y-2">
+            <p className="text-base font-bold text-teal-300">{qualitativeLabel}</p>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {correct} of {total} correct
+            </p>
+          </div>
+
+          {/* Responsible-AI disclaimer — consistent with MediaLiteracyProfile */}
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-900/60 border border-amber-500/20 text-left">
+            <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-slate-400 leading-relaxed">
+              This quiz score reflects performance on {total} questions — not a measurement of your overall media literacy.
+              Real critical thinking develops through repeated practice across many types of content over time.
+            </p>
           </div>
 
           <button

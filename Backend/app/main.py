@@ -16,17 +16,21 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# CORS
+# CORS — include production Vercel URL and cover all Vercel preview deployments
 origins = [o.strip() for o in settings.CORS_ORIGINS.split(",")] if settings.CORS_ORIGINS else ["*"]
 if "http://localhost:3000" not in origins:
     origins.append("http://localhost:3000")
 if "http://127.0.0.1:3000" not in origins:
     origins.append("http://127.0.0.1:3000")
+# Always include the known production Vercel URL
+if "https://athena-eta-flame.vercel.app" not in origins:
+    origins.append("https://athena-eta-flame.vercel.app")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
+    # Also allow localhost variants and all Vercel preview/branch deployments
+    allow_origin_regex=r"(http://(localhost|127\.0\.0\.1)(:\d+)?|https://athena-eta-flame(-[a-z0-9]+)?\.vercel\.app)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
