@@ -28,6 +28,8 @@ async def analyze_full_investigation(request: InvestigationRequest):
             is_demo_mode=request.is_demo
         )
         return result
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
