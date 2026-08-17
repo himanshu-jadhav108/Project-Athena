@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Compass, Home, Search, ShieldCheck, HelpCircle } from 'lucide-react';
+import { Play, Home, Search, ShieldCheck, HelpCircle } from 'lucide-react';
 
 function AthenaOwlIcon({ className = "w-8 h-8 text-sky-400" }: { className?: string }) {
   return (
@@ -91,12 +91,12 @@ export default function NotFound() {
           </div>
 
           <div className="pt-2 border-t border-slate-800/80 flex items-center justify-center gap-4 text-xs text-slate-400">
-            <Link href="/dashboard" className="hover:text-sky-400 transition-colors flex items-center gap-1">
-              <Compass className="w-3.5 h-3.5" /> Dashboard
+            <Link href="/investigate?demo=true" className="hover:text-amber-400 transition-colors flex items-center gap-1">
+              <Play className="w-3.5 h-3.5" /> Try Demo
             </Link>
             <span>•</span>
-            <Link href="/claim-checker" className="hover:text-sky-400 transition-colors flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" /> Claim Checker
+            <Link href="/" className="hover:text-sky-400 transition-colors flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5" /> Home
             </Link>
           </div>
         </motion.div>
