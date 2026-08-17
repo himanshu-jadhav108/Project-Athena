@@ -15,7 +15,7 @@ _“Play Your Part: Youth Designing the Future of Media and Information Literacy
     <a href="https://drive.google.com/file/d/1YETmUe8BM20g3E_RJslW8aZ7eUK1JOOB/view?usp=drive_link"><img src="https://img.shields.io/badge/Project_Report-Google_Drive-4285F4?style=for-the-badge&logo=googledocs&logoColor=white" alt="Project Report"></a>
     <a href="https://athena-backend-wrfq.onrender.com/"><img src="https://img.shields.io/badge/Backend_API-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Backend API"></a>
     <a href="https://athena-backend-wrfq.onrender.com/docs"><img src="https://img.shields.io/badge/API_Docs-Swagger-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="Swagger Docs"></a>
-    <a href="https://github.com/himanshu-jadhav108/Project-Athena"><img src="https://img.shields.io/badge/Test_Suite-13%2F13_Passing-success?style=for-the-badge&logo=pytest&logoColor=white" alt="Test Suite"></a>
+    <a href="https://github.com/himanshu-jadhav108/Project-Athena"><img src="https://img.shields.io/badge/Test_Suite-16%2F16_Passing-success?style=for-the-badge&logo=pytest&logoColor=white" alt="Test Suite"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License"></a>
   </p>
 
@@ -76,10 +76,10 @@ _“Play Your Part: Youth Designing the Future of Media and Information Literacy
 | :--------------------------: | :-----------------------------------------------: | :--------------------------------------------------------------------------- |
 | 🛡️ **5 UNESCO MIL Pillars**  | **Source, Context, Evidence, Framing, Forensics** | Comprehensive Media & Information Literacy skill tracking framework          |
 | 🧭 **4 Perspective Sectors** | **Scientific, Fact-Check, Mainstream, Community** | Multi-stakeholder viewpoint mapping for balanced discourse analysis          |
-|     🧪 **13 / 13 Tests**     |           **100% Pytest Passing Rate**            | Full test coverage across analysis, bias, scoring, and investigation modules |
+|     🧪 **16 / 16 Tests**     |           **100% Pytest Passing Rate**            | Full test coverage across analysis, bias, scoring, investigation, and responsible-AI modules |
 | ⚡ **Hybrid AI Resilience**  | **Google Gemini 2.0 + Deterministic Demo Engine** | 100% pitch reliability with zero offline failure modes                       |
 | 🔍 **Explainability Policy** |   **Epistemic Rationale & Evidence Footnotes**    | Zero black-box binary verdicts; calibrated uncertainty & confidence metrics  |
-| 🎮 **Gamified Progression**  |   **Badges, XP, Quizzes & Global Leaderboard**    | Active experiential learning designed for digital-native youth               |
+| 🎮 **Gamified Progression**  |   **Badges, Quizzes & Global Leaderboard**    | Active experiential learning designed for digital-native youth               |
 
 </div>
 
@@ -459,7 +459,7 @@ Open your browser at: [http://localhost:3000](http://localhost:3000)
 
 ## 🧪 Test Suite & Quality Verification
 
-### Backend Automated Test Suite (13 / 13 Passing)
+### Backend Automated Test Suite (16 / 16 Passing)
 
 ```bash
 cd Backend
@@ -468,27 +468,30 @@ cd Backend
 
 ```text
 ============================= test session starts =============================
-platform win32 -- Python 3.11+, pytest-9.1.1
+platform win32 -- Python 3.11+, pytest-9.0.3
 rootdir: D:\Projects\Project-Athena\Backend
 configfile: pytest.ini
 testpaths: tests
-collected 13 items
+collected 16 items
 
-tests\test_api.py::test_health PASSED                                    [  7%]
-tests\test_api.py::test_root PASSED                                      [ 15%]
-tests\test_api.py::test_claims_demo PASSED                               [ 23%]
-tests\test_api.py::test_claims_analyze PASSED                            [ 30%]
-tests\test_api.py::test_bias_detect PASSED                               [ 38%]
-tests\test_api.py::test_source_score PASSED                              [ 46%]
-tests\test_api.py::test_quiz_questions PASSED                            [ 53%]
-tests\test_api.py::test_quiz_categories PASSED                           [ 61%]
-tests\test_api.py::test_source_dataset PASSED                            [ 69%]
-tests\test_api.py::test_bias_reference PASSED                            [ 76%]
-tests\test_api.py::test_forensics_health PASSED                          [ 84%]
-tests\test_api.py::test_investigate_demo PASSED                          [ 92%]
-tests\test_api.py::test_investigate_full PASSED                          [100%]
+tests\test_api.py::test_health PASSED                                    [  6%]
+tests\test_api.py::test_root PASSED                                      [ 12%]
+tests\test_api.py::test_claims_demo PASSED                               [ 18%]
+tests\test_api.py::test_claims_analyze PASSED                            [ 25%]
+tests\test_api.py::test_bias_detect PASSED                               [ 31%]
+tests\test_api.py::test_source_score PASSED                              [ 37%]
+tests\test_api.py::test_quiz_questions PASSED                            [ 43%]
+tests\test_api.py::test_quiz_categories PASSED                           [ 50%]
+tests\test_api.py::test_source_dataset PASSED                            [ 56%]
+tests\test_api.py::test_bias_reference PASSED                            [ 62%]
+tests\test_api.py::test_forensics_health PASSED                          [ 68%]
+tests\test_api.py::test_investigate_demo PASSED                          [ 75%]
+tests\test_api.py::test_investigate_full_demo_mode PASSED                [ 81%]
+tests\test_api.py::test_investigate_full_live_unavailable_without_valid_key PASSED [ 87%]
+tests\test_api.py::test_arbitrary_claim_never_receives_demo_evidence PASSED [ 93%]
+tests\test_api.py::test_live_ai_provider_structure_validation PASSED     [100%]
 
-======================= 13 passed, 1 warning in 0.94s =========================
+============================== 16 passed, 1 warning in 6.80s =========================
 ```
 
 ### Frontend Production Build Verification
@@ -513,11 +516,11 @@ Route (app)                              Size     First Load JS
 ├ ○ /bias-detector                       2.33 kB         131 kB
 ├ ○ /claim-checker                       4.35 kB         133 kB
 ├ ○ /dashboard                           3.03 kB         199 kB
-├ ○ /investigate                         22.2 kB         151 kB
+├ ○ /investigate                         27.4 kB         156 kB
 ├ ○ /login                               3.45 kB         205 kB
 ├ ○ /signup                              3.78 kB         205 kB
 ├ ○ /source-scorer                       2.79 kB         131 kB
-└ ○ /trainer                             4.51 kB         133 kB
+└ ○ /trainer                             5.04 kB         134 kB
 + First Load JS shared by all            87.4 kB
 ```
 
